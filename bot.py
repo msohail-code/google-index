@@ -24,4 +24,5 @@ def process():
 
 
 if __name__ == "__main__":
+    app.listen(3000)
     app.run()
