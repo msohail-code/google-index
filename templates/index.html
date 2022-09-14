@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>URL Indexing</title>
+</head>
+
+<style>
+	*{
+    padding:0px;
+    margin:0px;
+    font-family:arial;
+}
+
+form#urlindex {
+    border:1px solid #0f0;
+    max-width:700px;
+    padding:20px;
+    margin: 20px auto;
+	min-height: 300px;
+}
+
+
+
+label {
+    display: block;
+    font-weight: 700;
+    margin: 3px 0;
+}
+
+#site{
+    width:90%;
+    padding:10px;
+    font-size:20px;
+    border-radius:4px;
+    
+    
+}
+
+input[type=submit]
+{
+    width: 93%;
+    padding: 10px;
+    font-size: 20px;
+    margin: 10px 0;
+    background: #0e89c3;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    
+}
+
+#result p {
+    margin:10px 0;
+}
+
+.error{
+    color:red;
+}
+
+.success{
+    color:green;
+}
+</style>
+<body>
+	<form id='urlindex' method="post">
+		<div class='field-group'>
+			<label for='site'>Enter URL:</label>
+			<input type="text" id="site" name="index"/>
+		</div>
+		<input type='submit' name="send" />
+		<div id='result'></div>
+	</form>
+</body>
+</html>
+<script type="text/javascript">
+
+	let ourForm = document.getElementById('urlindex');
+	
+	ourForm.onsubmit = function(e) {
+		e.preventDefault();
+		var data = new FormData(document.getElementById('urlindex'));
+		var result = document.getElementById('result');
+		var indexURI = document.getElementById('site').value;
+		
+		if(indexURI.length !== 0)
+		{
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "{{ url_for('process')}}");
+			xhr.onreadystatechange = function(){
+				if(this.readyState ==4 && this.status == 200)
+				{
+					ouput = '';
+					resp = JSON.parse(this.responseText);
+					if (resp.sucess = false)
+					{
+						output = `<div class='error'>
+								<p>${resp.error}</p>
+								<p class='error'><b>Success: </b>${resp.sucess}</p>
+							</div>`;
+					}else if (resp.sucess = true)
+					{
+						output = `<div class='sucess'>
+								<p><b>Meta URI: </b>${resp.meta_url}</p>
+								<p><b>URI: </b>${resp.url}</p>
+								<p><b>Type: </b>${resp.type}</p>
+								<p><b>Time: </b>${resp.time}</p>
+								<p class='success'><b>Success: </b>${resp.sucess}</p>
+							</div>`;
+					}
+
+					result.innerHTML = output
+				}
+			}
+			xhr.send(data)
+		}
+		else
+		{
+			result.innerHTML = "<p style='color:red'><b>Error:</b> Please enter the URL and try again</p>"
+		}
+	}
+
+
+</script>
